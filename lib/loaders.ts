@@ -151,26 +151,23 @@ export async function getAddresses(userId: string) {
   });
   return fetchData(`${API_BASE}/addresses?${query}`);
 }
-
 export async function registerUser(email: string, password: string, fullName: string, dni: string) {
-  const url = new URL("/auth/local/register", API_BASE); // ✅ también se puede usar con URL
   try {
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: email,
-        email,
-        password,
-        fullName,
-        dni,
-      }),
+    const response = await axios.post(`${API_BASE}/auth/local/register`, {
+      username: email, // Strapi requiere `username`, aunque uses email
+      email,
+      password,
+      fullName,
+      dni,
     });
-    return response.json();
-  } catch (error) {
-    console.error("Register Service Error:", error);
+
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error:", error.response?.status, error.response?.data);
+    } else {
+      console.error("Unexpected error:", error);
+    }
     throw error;
   }
 }
