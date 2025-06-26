@@ -4,7 +4,7 @@ import { getStrapiURL } from '@/lib/utils';
 import { getStorageItemAsync } from '@/hooks/useStorageState';
 
 const baseUrl = getStrapiURL();
-const API_BASE = 'http://127.0.0.1:1337/api';
+const API_BASE = `${baseUrl}/api`; // ✅ ahora usa la URL dinámica
 
 export async function getAuthHeader() {
   const user = await getStorageItemAsync('user');
@@ -47,7 +47,7 @@ export const mutateData = async (
 
     const response = await axios({
       method,
-      url: `${API_BASE}/${endpoint}`,
+      url: `${API_BASE}/${endpoint}`, // ✅ usa API_BASE dinámico
       headers,
       data: payload,
     });
@@ -88,7 +88,7 @@ export async function getProducts(options: GetProductsOptions = {}) {
     populate,
   }, { encodeValuesOnly: true });
 
-  return fetchData(`${baseUrl}/api/products?${query}`);
+  return fetchData(`${API_BASE}/products?${query}`);
 }
 
 export interface GetVendorsOptions {
@@ -115,14 +115,12 @@ export async function getVendors(options: GetVendorsOptions = {}) {
     populate,
   }, { encodeValuesOnly: true });
 
-  return fetchData(`${baseUrl}/api/vendors?${query}`);
+  return fetchData(`${API_BASE}/vendors?${query}`);
 }
 
 export async function getCategories() {
-  const query = qs.stringify({
-    sort: ["name:desc"],
-  });
-  return fetchData(`${baseUrl}/api/categories?${query}`);
+  const query = qs.stringify({ sort: ["name:desc"] });
+  return fetchData(`${API_BASE}/categories?${query}`);
 }
 
 export async function getProductById(productId: number | string) {
@@ -131,7 +129,7 @@ export async function getProductById(productId: number | string) {
     populate: ['cover', 'vendors'],
   }, { encodeValuesOnly: true });
 
-  return fetchData(`${baseUrl}/api/products?${query}`);
+  return fetchData(`${API_BASE}/products?${query}`);
 }
 
 export async function getOrders() {
@@ -139,7 +137,7 @@ export async function getOrders() {
     sort: ["id:desc"],
     populate: ['vendor', 'users_permissions_user'],
   });
-  return fetchData(`${baseUrl}/api/orders?${query}`);
+  return fetchData(`${API_BASE}/orders?${query}`);
 }
 
 export async function getAddresses(userId: string) {
@@ -151,11 +149,11 @@ export async function getAddresses(userId: string) {
       }
     },
   });
-  return fetchData(`${baseUrl}/api/addresses?${query}`);
+  return fetchData(`${API_BASE}/addresses?${query}`);
 }
 
 export async function registerUser(email: string, password: string, fullName: string, dni: string) {
-  const url = new URL("/api/auth/local/register", baseUrl);
+  const url = new URL("/auth/local/register", API_BASE); // ✅ también se puede usar con URL
   try {
     const response = await fetch(url.toString(), {
       method: "POST",
@@ -184,7 +182,7 @@ export const loginUser = async (email: string, password: string) => {
       password: password
     });
 
-    return response.data; // { jwt, user: { ... } }
+    return response.data;
   } catch (error: any) {
     if (error.response) {
       console.error("Login error:", error.response.data);
@@ -205,7 +203,7 @@ export async function createPreference(title: string, qty: number, price: number
         title,
         quantity: qty,
         price,
-        external_reference, // ✅ nuevo campo
+        external_reference,
       }),
     });
 
@@ -215,4 +213,3 @@ export async function createPreference(title: string, qty: number, price: number
     throw error;
   }
 }
-
