@@ -1,14 +1,19 @@
 {
   "name": "tap-monorepo",
   "private": true,
-  "workspaces": ["api-server", "mobile"],
+  "workspaces": [
+    "api-server",
+    "mobile"
+  ],
   "scripts": {
-  "dev": "concurrently \"npm run dev:api\" \"npm run dev:mobile:web\"",
-  "dev:mobile": "cd mobile && npx expo start",
-  "dev:mobile:web": "cd mobile && npx expo start --web",
-  "dev:api": "cd api-server && npx prisma migrate dev --name init && npx prisma db seed && npm run dev",
-  "prisma:migrate": "cd api-server && npx prisma migrate dev",
-  "prisma:studio": "cd api-server && npx prisma studio"
-}
-
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:mobile:web\"",
+    "dev:mobile": "cd mobile && npx expo start",
+    "dev:mobile:web": "cd mobile && npx expo start --web",
+    "dev:api": "cd api-server && npx prisma migrate dev --name init && npx prisma db seed && npm run dev",
+    "prisma:migrate": "cd api-server && npx prisma migrate dev",
+    "prisma:studio": "cd api-server && npx prisma studio",
+    "build": "npm run build:api && npm run build:web",
+    "build:api": "cd api-server && npm install && npm run build",
+    "build:web": "cd mobile && npm install && expo export --platform web -o dist"
+  }
 }

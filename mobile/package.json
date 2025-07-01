@@ -10,12 +10,14 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "build": "expo export"
+    "build": "expo export:web",
+    "dev": "expo start --web"
   },
   "jest": {
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@expo/next-adapter": "^6.0.0",
     "@expo/vector-icons": "^14.0.2",
     "@mercadopago/sdk-react": "^1.0.0",
     "@prisma/client": "^6.10.1",
