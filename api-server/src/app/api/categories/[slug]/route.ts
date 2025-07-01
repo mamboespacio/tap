@@ -2,12 +2,18 @@ import { prisma } from '@/lib/prisma';
 import { withCors, handleOptions } from '@/lib/withCors';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
-  const slug = req.nextUrl.pathname.split('/').pop();
+type Params = {
+  params: {
+    slug: string;
+  };
+};
+
+export async function GET(req: NextRequest, { params }: Params) {
+  const { slug } = params;
 
   try {
     const category = await prisma.category.findUnique({
-      where: { slug: slug },
+      where: { slug },
       include: {
         products: {
           include: { vendor: true },
