@@ -1,19 +1,13 @@
 import { prisma } from '@/lib/prisma';
 import { withCors, handleOptions } from '@/lib/withCors';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-type Params = {
-  params: {
-    id: string;
-  };
-};
-
-export async function GET(req: Request, { params }: Params) {
-  const vendorId = parseInt(params.id);
+export async function GET(req: NextRequest) {
+  const id = req.nextUrl.pathname.split('/').pop();
 
   try {
     const vendor = await prisma.vendor.findUnique({
-      where: { id: vendorId },
+      where: { id: id },
       include: {
         products: {
           include: {

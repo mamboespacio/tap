@@ -1,19 +1,17 @@
 // app/api/vendors/[slug]/route.ts
 import { prisma } from '@/lib/prisma';
 import { withCors, handleOptions } from '@/lib/withCors';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(
-  req: Request,
-  { params }: { params: { slug: string } }
-) {
+export async function GET(req: NextRequest) {
+  const slug = req.nextUrl.pathname.split('/').pop();
   try {
     const vendors = await prisma.vendor.findMany({
       where: {
         products: {
           some: {
             category: {
-              slug: params.slug,
+              slug: slug,
             },
           },
         },
@@ -22,7 +20,7 @@ export async function GET(
         products: {
           where: {
             category: {
-              slug: params.slug,
+              slug: slug,
             },
           },
           include: {
