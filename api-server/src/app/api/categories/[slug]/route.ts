@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/prisma';
-import { NextRequest } from 'next/server';
+import { withCors, handleOptions } from '@/lib/withCors';
 
 export async function GET(
-  req: NextRequest,
+  _: Request,
   { params }: { params: { slug: string } }
 ) {
   try {
@@ -10,27 +10,37 @@ export async function GET(
       where: { slug: params.slug },
       include: {
         products: {
-          include: {
-            vendor: true,
-          },
+          include: { vendor: true },
         },
       },
     });
 
     if (!category) {
-      return new Response(JSON.stringify({ error: 'Categoría no encontrada' }), {
-        status: 404,
-      });
+      return withCors(
+        new Response(JSON.stringify({ error: 'Categoría no encontrada' }), {
+          status: 404,
+        })
+      );
     }
 
-    return new Response(JSON.stringify(category), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return withCors(
+      new Response(JSON.stringify(category), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
   } catch (error) {
     console.error('Error al obtener categoría:', error);
-    return new Response(JSON.stringify({ error: 'Error interno del servidor' }), {
-      status: 500,
-    });
+    return withCors(
+      new Response(JSON.stringify({ error: 'Error interno del servidor' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
   }
+}
+
+// Soporte para preflight CORS
+export function OPTIONS() {
+  return handleOptions();
 }
