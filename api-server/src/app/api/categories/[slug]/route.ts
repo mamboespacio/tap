@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { withCors, handleOptions } from '@/lib/withCors';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 type Params = {
   params: {
@@ -8,12 +8,12 @@ type Params = {
   };
 };
 
-export async function GET(req: Request, { params }: Params) {
-  const productId = parseInt(params.slug);
+export async function GET(req: NextRequest) {
+  const slug = req.nextUrl.pathname.split('/').pop();
 
   try {
     const category = await prisma.category.findUnique({
-      where: { slug: params.slug },
+      where: { slug: slug },
       include: {
         products: {
           include: { vendor: true },
