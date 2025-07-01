@@ -4,10 +4,15 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.pathname.split('/').pop();
+  const psrsedId = id ? parseInt(id, 10) : undefined;
+
+  if (!psrsedId || isNaN(psrsedId)) {
+    return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+  }
 
   try {
     const product = await prisma.product.findUnique({
-      where: { id: id },
+      where: { id: psrsedId },
       include: {
         category: { select: { id: true, name: true } },
         vendor: { select: { id: true, name: true, address: true, openingHours: true, closingHours: true  } },
