@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  orders    Order[]
+  addresses Address[]
+  cards     Card[]
+}
+
+model Vendor {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  address      String  @default("Av. Siempre Viva 742")
+  openingHours DateTime @default("1970-01-01T10:00:00.000Z")
+  closingHours DateTime @default("1970-01-01T18:00:00.000Z")
+  products Product[]
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  slug      String    @unique
+  products  Product[]
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  price       Float
+  vendorId    Int
+  vendor      Vendor      @relation(fields: [vendorId], references: [id])
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orders      OrderProduct[]
+}
+
+model Order {
+  id         Int             @id @default(autoincrement())
+  userId     Int
+  user       User            @relation(fields: [userId], references: [id])
+  products   OrderProduct[]
+  price      Float
+  condition  String          // pending, paid, cancelled, etc.
+  createdAt  DateTime        @default(now())
+}
+
+model OrderProduct {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Address {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  street    String
+  city      String
+  zipCode   String
+  country   String
+}
+
+model Card {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  brand     String
+  last4     String
+  expMonth  Int
+  expYear   Int
+}
