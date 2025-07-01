@@ -23,6 +23,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "expo": {
+      "name": "tap",
+      "slug": "tap",
       "web": {
         "bundler": "metro"
       }
