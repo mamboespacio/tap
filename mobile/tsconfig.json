@@ -1,0 +1,18 @@
+{
+  "extends": "expo/tsconfig.base", // ✅ Hereda configuración recomendada por Expo
+  "compilerOptions": {
+    "baseUrl": ".",                // ✅ Permite usar paths relativos desde la raíz del folder `mobile`
+    "paths": {
+      "@/*": ["./*"],              // ✅ Soporte para alias `@/components/...` dentro de `mobile`
+      "@common/*": ["../packages/common/*"] // ✅ Alias a código compartido
+    },
+    "jsx": "react-native"          // ✅ Correcto para apps Expo/React Native
+  },
+  "include": [
+    "app",                         // ✅ rutas con expo-router
+    "components",
+    "lib",
+    "types",
+    "nativewind-env.d.ts"         // ✅ necesario para NativeWind si lo usás
+, "../api-server/withCors.ts"  ]
+}
