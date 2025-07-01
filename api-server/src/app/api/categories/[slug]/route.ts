@@ -1,17 +1,19 @@
 import { prisma } from '@/lib/prisma';
-import { NextRequest } from 'next/server';
+import { withCors, handleOptions } from '@/lib/withCors';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const slug = url.pathname.split('/').pop(); // o usar regex si prefieres más precisión
+type Params = {
+  params: {
+    slug: string;
+  };
+};
 
-  if (!slug) {
-    return new Response(JSON.stringify({ error: 'Slug inválido' }), { status: 400 });
-  }
+export async function GET(req: Request, { params }: Params) {
+  const productId = parseInt(params.slug);
 
   try {
     const category = await prisma.category.findUnique({
-      where: { slug },
+      where: { slug: params.slug },
       include: {
         products: {
           include: { vendor: true },
@@ -20,19 +22,18 @@ export async function GET(req: NextRequest) {
     });
 
     if (!category) {
-      return new Response(JSON.stringify({ error: 'Categoría no encontrada' }), {
-        status: 404,
-      });
+      return new Response('Categoría no encontrada', { status: 404 });
     }
 
-    return new Response(JSON.stringify(category), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return withCors(NextResponse.json(category));
   } catch (error) {
-    console.error('Error al obtener categoría:', error);
-    return new Response(JSON.stringify({ error: 'Error interno del servidor' }), {
-      status: 500,
-    });
+    console.error('Error al obtener la categoria:', error);
+    return withCors(
+      NextResponse.json({ message: 'Internal Server Error' }, { status: 500 })
+    );
   }
+}
+
+export function OPTIONS() {
+  return handleOptions();
 }
