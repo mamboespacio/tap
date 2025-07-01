@@ -2,12 +2,6 @@ import { prisma } from '@/lib/prisma';
 import { withCors, handleOptions } from '@/lib/withCors';
 import { NextRequest, NextResponse } from 'next/server';
 
-type Params = {
-  params: {
-    slug: string;
-  };
-};
-
 export async function GET(req: NextRequest) {
   const slug = req.nextUrl.pathname.split('/').pop();
 
